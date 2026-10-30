@@ -20,7 +20,7 @@ export default function RestPage() {
   const { logActivity } = useThaw();
   const [breathingPhase, setBreathingPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
   const [suggestionIndex, setSuggestionIndex] = useState<number>(0);
-  const [viewMode, setViewMode] = useState<'book' | 'workstation'>('book');
+  const [viewMode, setViewMode] = useState<'workstation' | 'book'>('workstation');
   const bookConfig = findBookByRoute('/rest');
 
   useEffect(() => {

@@ -10,7 +10,7 @@ import { findBookByRoute } from '@/lib/books';
 
 export default function InsightsPage() {
   const { tasks, activities, energyLevel } = useThaw();
-  const [viewMode, setViewMode] = useState<'book' | 'workstation'>('book');
+  const [viewMode, setViewMode] = useState<'workstation' | 'book'>('workstation');
   const bookConfig = findBookByRoute('/insights');
 
   const completed = tasks.filter((t) => t.completed);

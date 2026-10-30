@@ -64,7 +64,7 @@ export default function SequencerPage() {
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [showRAGModal, setShowRAGModal] = useState(false);
-  const [viewMode, setViewMode] = useState<'book' | 'workstation'>('book');
+  const [viewMode, setViewMode] = useState<'workstation' | 'book'>('workstation');
   const bookConfig = findBookByRoute('/sequencer');
 
   const [stepTitles, setStepTitles] = useState<Record<string, string>>({});

@@ -81,3 +81,4 @@ chrome.notifications.onButtonClicked.addListener((notifId, btnIdx) => {
     chrome.tabs.create({ url: "http://localhost:3000/dashboard" });
   }
 });
+

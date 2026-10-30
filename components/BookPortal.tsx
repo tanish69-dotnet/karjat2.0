@@ -39,14 +39,9 @@ export function BookPortal({ children }: BookPortalProps) {
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Detect if we landed directly on a feature route (e.g. /sequencer via URL)
+  // Let feature routes render their primary workstation directly without triggering the full-screen portal
   useEffect(() => {
-    if (pathname === "/") return;
-    const book = findBookByRoute(pathname);
-    if (book && phase === "idle") {
-      setActiveBook(book);
-      setPhase("open");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Only open portal if explicitly triggered via shelf postMessage, not on route landing
   }, []);
 
   // Listen for postMessage from the shelf iframe

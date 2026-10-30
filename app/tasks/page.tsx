@@ -40,7 +40,7 @@ export default function TasksPage() {
   const { addToast } = useToast();
 
   const [showAdd, setShowAdd] = useState(false);
-  const [viewMode, setViewMode] = useState<'book' | 'workstation'>('book');
+  const [viewMode, setViewMode] = useState<'workstation' | 'book'>('workstation');
   const bookConfig = findBookByRoute('/tasks');
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [search, setSearch] = useState('');

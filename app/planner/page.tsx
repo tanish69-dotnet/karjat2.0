@@ -18,7 +18,7 @@ export default function PlannerPage() {
   const [proposal, setProposal] = useState<ReturnType<typeof rebalanceWeek> | null>(null);
   const [reviewing, setReviewing] = useState(false);
   const [applied, setApplied] = useState(false);
-  const [viewMode, setViewMode] = useState<'book' | 'workstation'>('book');
+  const [viewMode, setViewMode] = useState<'workstation' | 'book'>('workstation');
   const bookConfig = findBookByRoute('/planner');
 
   useEffect(() => {

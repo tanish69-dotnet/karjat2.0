@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, X, BookOpen } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, BookOpen, Layers } from "lucide-react";
 import { BookConfig } from "@/lib/books";
 import { getBookEditorial } from "@/lib/bookEditorialContent";
 import {
@@ -101,10 +101,11 @@ export function OpenBookSpreadView({ book, onClose }: OpenBookSpreadViewProps) {
             <button
               type="button"
               onClick={onClose}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-[#f4eee6] transition text-xs font-mono"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#c87046] hover:bg-[#b56138] text-white transition text-xs font-mono font-semibold shadow-md shadow-[#c87046]/30 cursor-pointer"
+              title="Open full interactive workstation view"
             >
-              <X className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Close Volume</span>
+              <Layers className="w-3.5 h-3.5" />
+              <span>Full Workstation View</span>
             </button>
           </div>
         </div>
