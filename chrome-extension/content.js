@@ -262,3 +262,4 @@
   // Initial status fetch
   refreshStatus();
 })();
+

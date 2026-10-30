@@ -160,3 +160,4 @@ Rules:
     { headers: corsHeaders }
   );
 }
+

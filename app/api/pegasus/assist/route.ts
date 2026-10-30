@@ -121,3 +121,4 @@ Strictly avoid medical or clinical labels.`;
     { headers: corsHeaders }
   );
 }
+

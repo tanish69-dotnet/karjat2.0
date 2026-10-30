@@ -60,3 +60,4 @@ Pegasus is a Manifest V3 Google Chrome Extension that connects real-time browser
 - Full CORS support.
 - Grounded in local RAG strategies from `lib/rag.ts`.
 - Zero-Downtime Deterministic Fallback guaranteeing 100% reliability offline or without API keys.
+

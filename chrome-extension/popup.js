@@ -232,3 +232,4 @@ function renderActiveTab(activeTab, lastStudyTab) {
     anchorCard.style.display = "none";
   }
 }
+
