@@ -2,6 +2,12 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+export interface Subtask {
+  id: string;
+  title: string;
+  completed: boolean;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -12,6 +18,7 @@ export interface Task {
   isFlexible: boolean;
   completed: boolean;
   createdAt: string;
+  subtasks?: Subtask[];
 }
 
 export interface ActivityItem {
@@ -30,6 +37,10 @@ interface ThawContextType {
   updateTask: (id: string, updates: Partial<Task>) => void;
   deleteTask: (id: string) => void;
   toggleTaskComplete: (id: string) => void;
+  addSubtask: (taskId: string, title: string) => void;
+  toggleSubtask: (taskId: string, subId: string) => void;
+  deleteSubtask: (taskId: string, subId: string) => void;
+  reorderSubtasks: (taskId: string, subtasks: Subtask[]) => void;
   activities: ActivityItem[];
   logActivity: (type: ActivityItem['type'], title: string, details?: string) => void;
   clearAllData: () => void;
@@ -51,7 +62,11 @@ const INITIAL_TASKS: Task[] = [
     energyRequired: 3,
     isFlexible: false,
     completed: false,
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
+    subtasks: [
+      { id: 'sub-1', title: 'Open the assignment document', completed: false },
+      { id: 'sub-2', title: 'Gather logic gate references', completed: false },
+    ],
   },
   {
     id: 't-2',
@@ -125,7 +140,8 @@ export function ThawProvider({ children }: { children: React.ReactNode }) {
       ...taskData,
       id: `task-${Date.now()}`,
       completed: false,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      subtasks: [],
     };
     const updated = [newTask, ...tasks];
     saveTasks(updated);
@@ -150,6 +166,56 @@ export function ThawProvider({ children }: { children: React.ReactNode }) {
     if (nextCompleted) {
       logActivity('task_completed', `Completed task: ${task.title}`);
     }
+  };
+
+  const addSubtask = (taskId: string, title: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task || !title.trim()) return;
+    const subtask: Subtask = {
+      id: `sub-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      title: title.trim(),
+      completed: false,
+    };
+    const updated = tasks.map((t) => {
+      if (t.id !== taskId) return t;
+      return {
+        ...t,
+        subtasks: [...(t.subtasks ?? []), subtask],
+      };
+    });
+    saveTasks(updated);
+  };
+
+  const toggleSubtask = (taskId: string, subId: string) => {
+    const updated = tasks.map((t) => {
+      if (t.id !== taskId) return t;
+      return {
+        ...t,
+        subtasks: (t.subtasks ?? []).map((s) =>
+          s.id === subId ? { ...s, completed: !s.completed } : s
+        ),
+      };
+    });
+    saveTasks(updated);
+  };
+
+  const deleteSubtask = (taskId: string, subId: string) => {
+    const updated = tasks.map((t) => {
+      if (t.id !== taskId) return t;
+      return {
+        ...t,
+        subtasks: (t.subtasks ?? []).filter((s) => s.id !== subId),
+      };
+    });
+    saveTasks(updated);
+  };
+
+  const reorderSubtasks = (taskId: string, subtasks: Subtask[]) => {
+    const updated = tasks.map((t) => {
+      if (t.id !== taskId) return t;
+      return { ...t, subtasks };
+    });
+    saveTasks(updated);
   };
 
   const logActivity = (type: ActivityItem['type'], title: string, details?: string) => {
@@ -185,6 +251,10 @@ export function ThawProvider({ children }: { children: React.ReactNode }) {
       updateTask,
       deleteTask,
       toggleTaskComplete,
+      addSubtask,
+      toggleSubtask,
+      deleteSubtask,
+      reorderSubtasks,
       activities,
       logActivity,
       clearAllData,

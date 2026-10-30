@@ -1,143 +1,166 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { Sparkles, ArrowRight, ShieldCheck, Heart, Zap, Compass, Coffee } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { CompleteShelfLandingPage } from "@/components/threeui/CompleteShelfLandingPage";
+import { BookPortal } from "@/components/BookPortal";
+import { ThawIntro } from "@/components/ThawIntro";
+import {
+  Sparkles,
+  ArrowRight,
+  Heart,
+  Coffee,
+  LayoutDashboard,
+  ChevronDown,
+} from "lucide-react";
+
+const FEATURES = [
+  {
+    title: "Check in gently",
+    body: "Start with a 1-5 spoon energy scale. Recommendations adapt to your actual capacity, not idealized expectations.",
+    icon: Heart,
+  },
+  {
+    title: "Melt overwhelm",
+    body: "The AI task sequencer breaks intimidating academic work into a 2-minute starting step, grounded in retrieved cognitive strategies.",
+    icon: Sparkles,
+  },
+  {
+    title: "Rest without guilt",
+    body: "Rest is a first-class citizen. Step into a calm sanctuary with guided breathing whenever you need to recharge.",
+    icon: Coffee,
+  },
+];
 
 export default function LandingPage() {
+  const [showIntro, setShowIntro] = useState(true);
+
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem("thaw_intro_seen") === "true") {
+        setShowIntro(false);
+      }
+    } catch {}
+  }, []);
+
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-24 px-6 md:px-12 flex flex-col items-center text-center overflow-hidden">
-        {/* Background atmospheric glows */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-sage-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
+    <div className="relative w-full min-h-screen bg-[#080808] text-[#f4eee6] overflow-x-hidden">
+      {/* Cinematic Book-Opening Intro Sequence */}
+      {showIntro && (
+        <ThawIntro onComplete={() => setShowIntro(false)} />
+      )}
 
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-thaw-800/80 border border-thaw-700/50 text-sage-300 text-xs md:text-sm mb-6 shadow-glass">
-          <Sparkles className="w-4 h-4 text-sage-400" />
-          <span>A gentle co-pilot for getting unstuck</span>
-        </div>
+      {/* SECTION 1: 3D HERO - Book Portal wraps the interactive shelf */}
+      <BookPortal>
+        <section className="relative w-full h-screen overflow-hidden flex flex-col justify-between">
+          {/* Floating Top Navigation */}
+          <nav className="absolute top-5 left-6 right-6 z-20 flex items-center justify-between pointer-events-auto">
+            <Link
+              href="/"
+              className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#171a24]/80 backdrop-blur-md border border-[rgba(244,238,230,0.18)] text-[#f4eee6] font-serif text-lg tracking-wide hover:border-[rgba(244,238,230,0.36)] transition shadow-lg"
+            >
+              <span className="w-6 h-6 rounded-full bg-[#c87046]/20 text-[#c87046] flex items-center justify-center text-xs">
+                ❄
+              </span>
+              <span>Thaw</span>
+            </Link>
 
-        <h1 className="max-w-4xl text-4xl md:text-6xl lg:text-7xl font-serif font-normal tracking-tight text-white mb-6 leading-[1.15]">
-          You don't have to do it all. <br />
-          <span className="text-sage-300 italic">Just find your next small step.</span>
-        </h1>
+            <div className="flex items-center gap-3">
+              <a
+                href="#about"
+                className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium text-[#b9b4ae] hover:text-[#f4eee6] transition"
+              >
+                <span>Features &amp; Philosophy</span>
+                <ChevronDown className="w-3.5 h-3.5" />
+              </a>
 
-        <p className="max-w-2xl text-base md:text-lg text-thaw-300 mb-10 leading-relaxed">
-          Thaw helps university students and neurodivergent minds move through task paralysis and overwhelm with flexible planning, AI-assisted micro-steps, and guilt-free rest.
-        </p>
+              <Link
+                href="/sequencer"
+                className="hidden md:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium text-[#b9b4ae] hover:text-[#f4eee6] bg-[#171a24]/60 backdrop-blur-md border border-[rgba(244,238,230,0.14)] hover:border-[#c87046]/50 transition"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#c87046]" />
+                <span>AI Sequencer</span>
+              </Link>
 
-        <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center">
-          <Link
-            href="/dashboard"
-            className="w-full sm:w-auto px-8 py-4 rounded-full bg-sage-500 text-thaw-950 font-semibold hover:bg-sage-400 transition shadow-xl shadow-sage-900/30 flex items-center justify-center gap-2 text-base"
-          >
-            Find my next step
-            <ArrowRight className="w-5 h-5" />
-          </Link>
-          <Link
-            href="/sequencer"
-            className="w-full sm:w-auto px-8 py-4 rounded-full glass-panel text-white hover:bg-thaw-800/80 transition flex items-center justify-center gap-2 text-base"
-          >
-            Try AI Task Sequencer
-          </Link>
-        </div>
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#c87046] hover:bg-[#b56138] text-white font-medium text-xs tracking-wider uppercase transition shadow-lg shadow-[#c87046]/25"
+              >
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                <span>Launch App</span>
+              </Link>
+            </div>
+          </nav>
 
-        {/* Hero preview card */}
-        <div className="mt-16 w-full max-w-4xl glass-panel rounded-2xl p-6 md:p-8 border border-thaw-700/40 text-left shadow-2xl relative">
-          <div className="absolute -top-3 right-6 bg-sage-500 text-thaw-950 text-xs font-semibold px-3 py-1 rounded-full">
-            Live Preview
+          {/* 3D Shelf Canvas Frame */}
+          <div className="absolute inset-0 z-0">
+            <CompleteShelfLandingPage
+              headingFont="iowan-old-style"
+              bodyFont="inter"
+              headingWeight="400"
+              bodyWeight="400"
+              primaryColor="#c87046"
+              headingSize={60}
+              bodySize={12}
+              headingLetterSpacing={-0.055}
+              className="w-full h-full"
+            />
           </div>
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-thaw-800/60">
+        </section>
+      </BookPortal>
+
+      {/* SECTION 2: PHILOSOPHY & CAPABILITIES */}
+      <section id="about" className="py-24 px-6 md:px-12 bg-[#10131b] border-t border-[rgba(244,238,230,0.12)]">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#171a24] border border-[rgba(244,238,230,0.14)] text-[#c87046] text-xs font-mono uppercase tracking-widest mb-4">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Executive Function Co-Pilot</span>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-serif text-[#f4eee6] mb-6 tracking-tight">
+              Productivity that meets you where you are.
+            </h2>
+            <p className="text-[#b9b4ae] text-base md:text-lg leading-relaxed">
+              Standard productivity apps assume endless stamina and penalize missed streaks. Thaw adapts to your current spoon level, sequences work into 2-minute micro-actions, and treats rest as an essential tool.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {FEATURES.map((f, i) => {
+              const Icon = f.icon;
+              return (
+                <div
+                  key={i}
+                  className="p-8 rounded-2xl bg-[#171a24]/60 border border-[rgba(244,238,230,0.12)] hover:border-[rgba(200,112,70,0.4)] transition-all flex flex-col justify-between group"
+                >
+                  <div>
+                    <div className="w-12 h-12 rounded-xl bg-[#c87046]/10 text-[#c87046] flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-xl font-serif text-[#f4eee6] mb-3">{f.title}</h3>
+                    <p className="text-sm text-[#b9b4ae] leading-relaxed">{f.body}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Quick Nav Footer */}
+          <div className="mt-16 p-8 rounded-2xl bg-gradient-to-r from-[#171a24] to-[#1c2230] border border-[rgba(244,238,230,0.14)] flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
-              <p className="text-xs text-sage-300 uppercase tracking-wider">Today's Energy Check-in</p>
-              <h2 className="text-xl font-serif text-white">How is your battery feeling right now?</h2>
+              <h4 className="text-xl font-serif text-[#f4eee6] mb-1">Ready to find your next step?</h4>
+              <p className="text-sm text-[#b9b4ae]">Everything is saved locally on your device with complete privacy.</p>
             </div>
-            <div className="flex items-center gap-2 bg-thaw-900 px-4 py-2 rounded-xl border border-thaw-700/40 text-amber-300 text-sm">
-              <span>🥄</span>
-              <span className="font-medium">3 / 5 Spoons (Steady Capacity)</span>
-            </div>
-          </div>
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="glass-card p-4 rounded-xl">
-              <p className="text-xs text-sage-400 mb-1">Current Focus Task</p>
-              <h3 className="font-medium text-white text-sm">Prepare assignment outline</h3>
-              <p className="text-xs text-thaw-300 mt-2">1 next small action ready</p>
-            </div>
-            <div className="glass-card p-4 rounded-xl">
-              <p className="text-xs text-sage-400 mb-1">Recommended Micro-Start</p>
-              <h3 className="font-medium text-white text-sm">Open document & type title</h3>
-              <p className="text-xs text-sage-300 mt-2">Duration: 2 minutes</p>
-            </div>
-            <div className="glass-card p-4 rounded-xl">
-              <p className="text-xs text-sage-400 mb-1">Alternative Option</p>
-              <h3 className="font-medium text-white text-sm">Guilt-Free Rest Mode</h3>
-              <p className="text-xs text-thaw-300 mt-2">Step away without penalty</p>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/dashboard"
+                className="px-6 py-3 rounded-full bg-[#c87046] hover:bg-[#b56138] text-white font-medium text-sm transition shadow-lg shadow-[#c87046]/20 flex items-center gap-2"
+              >
+                <span>Launch Dashboard</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Problem & Philosophy */}
-      <section className="py-20 px-6 md:px-12 bg-thaw-900/50 border-t border-b border-thaw-800/40">
-        <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-serif text-white mb-6">
-            Conventional productivity apps were built for neurotypical consistency.
-          </h2>
-          <p className="text-thaw-300 max-w-3xl mx-auto text-base md:text-lg leading-relaxed mb-16">
-            Rigid schedules, alarms, shaming overdue labels, and broken streaks often deepen executive dysfunction and task paralysis. Thaw takes a different approach: empathy, adjustable spoon budgeting, and microscopic friction reduction.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-            <div className="glass-panel p-6 rounded-2xl">
-              <div className="w-12 h-12 rounded-xl bg-sage-500/20 text-sage-300 flex items-center justify-center mb-4">
-                <Heart className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-serif text-white mb-2">1. Check In Gently</h3>
-              <p className="text-sm text-thaw-300 leading-relaxed">
-                Start by measuring your daily capacity on a 1–5 spoons scale. Recommendations instantly adapt to your actual energy, not idealized expectations.
-              </p>
-            </div>
-
-            <div className="glass-panel p-6 rounded-2xl">
-              <div className="w-12 h-12 rounded-xl bg-sage-500/20 text-sage-300 flex items-center justify-center mb-4">
-                <Sparkles className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-serif text-white mb-2">2. Melt Overwhelm</h3>
-              <p className="text-sm text-thaw-300 leading-relaxed">
-                Our RAG-powered AI task sequencer breaks intimidating projects into 2-minute starting steps grounded in non-clinical cognitive science.
-              </p>
-            </div>
-
-            <div className="glass-panel p-6 rounded-2xl">
-              <div className="w-12 h-12 rounded-xl bg-sage-500/20 text-sage-300 flex items-center justify-center mb-4">
-                <Coffee className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-serif text-white mb-2">3. Rest Without Guilt</h3>
-              <p className="text-sm text-thaw-300 leading-relaxed">
-                Rest is built in as a first-class citizen. Step into calming scenic environments with breathing guidance whenever you need to recharge.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="py-24 px-6 text-center">
-        <div className="max-w-3xl mx-auto glass-panel p-10 md:p-14 rounded-3xl border border-sage-500/30">
-          <h2 className="text-3xl md:text-5xl font-serif text-white mb-6">
-            Ready to experience a gentler way to plan?
-          </h2>
-          <p className="text-thaw-300 mb-8 max-w-xl mx-auto">
-            Step into Thaw and discover how one small action can break the cycle of paralysis.
-          </p>
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-sage-500 text-thaw-950 font-semibold hover:bg-sage-400 transition shadow-xl text-lg"
-          >
-            Launch Thaw Dashboard
-            <ArrowRight className="w-5 h-5" />
-          </Link>
         </div>
       </section>
     </div>

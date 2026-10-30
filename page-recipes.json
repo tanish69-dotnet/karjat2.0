@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <script id="threeui-checkout-return">
+      // Run before the Google tag can read a Stripe return URL. Keep this
+      // explicit-ID capture in sync with src/checkoutReturn.ts.
+      (() => {
+        const url = new URL(window.location.href);
+        const legacyReturn = url.pathname === "/pricing"
+          && ["success", "processing"].includes(url.searchParams.get("checkout") || "");
+        if ((url.pathname !== "/purchase/success" && !legacyReturn) || !url.searchParams.has("session_id")) return;
+        const id = url.searchParams.get("session_id") || "";
+        const valid = url.searchParams.getAll("session_id").length === 1 && /^cs_(?:test|live)_[A-Za-z0-9]+$/.test(id);
+        const capturedAt = Date.now();
+        try {
+          if (valid) {
+            window.sessionStorage.setItem("threeui.checkout-session.v1", id);
+            window.sessionStorage.setItem("threeui.checkout-captured-at.v1", String(capturedAt));
+          } else {
+            window.sessionStorage.removeItem("threeui.checkout-session.v1");
+            window.sessionStorage.removeItem("threeui.checkout-captured-at.v1");
+          }
+        } catch { /* History still supports verification when storage is blocked. */ }
+        url.searchParams.delete("session_id");
+        if (legacyReturn) {
+          url.pathname = "/purchase/success";
+          url.searchParams.delete("checkout");
+        }
+        const state = { ...window.history.state };
+        if (valid) {
+          state.threeuiCheckoutSessionId = id;
+          state.threeuiCheckoutCapturedAt = capturedAt;
+        } else {
+          delete state.threeuiCheckoutSessionId;
+          delete state.threeuiCheckoutCapturedAt;
+        }
+        window.history.replaceState(state, "", url);
+      })();
+    </script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5WP9FS3ECK"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-5WP9FS3ECK');
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (() => {
+        const root = document.documentElement;
+        const palettes = new Set(["mono", "sepia", "azure", "moss", "mauve"]);
+        try {
+          const savedTheme = localStorage.getItem("threeui-theme");
+          const lightPalette = localStorage.getItem("threeui-palette-light");
+          const darkPalette = localStorage.getItem("threeui-palette-dark");
+          const mode = savedTheme === "light" || savedTheme === "system" ? savedTheme : "dark";
+          if (mode === "system") root.removeAttribute("data-theme");
+          else root.dataset.theme = mode;
+          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          const scheme = mode === "system" ? (prefersDark ? "dark" : "light") : mode;
+          root.dataset.scheme = scheme;
+          const palette = scheme === "dark" ? darkPalette : lightPalette;
+          root.dataset.palette = palettes.has(palette) ? palette : "mono";
+        } catch {
+          root.dataset.theme = "dark";
+          root.dataset.scheme = "dark";
+          root.dataset.palette = "mono";
+        }
+      })();
+    </script>
+    <style id="threeui-initial-load-styles">
+      /* Inline so the SEO fallback cannot flash before the app CSS arrives. */
+      [data-threeui-loader] { display: none; }
+      html[data-threeui-booting] [data-threeui-static] { display: none; }
+      html[data-threeui-booting] [data-threeui-loader] {
+        --initial-ink: var(--foreground, #edeef0);
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        box-sizing: border-box;
+        padding: 24px;
+        background: var(--content-bg, #131416);
+        color: var(--foreground-muted, #8a8f98);
+        font: 12px/1.6 -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+        text-align: center;
+      }
+      html[data-scheme="light"][data-threeui-booting] [data-threeui-loader] {
+        --initial-ink: var(--foreground, #242424);
+        background: var(--content-bg, #fbfbfa);
+        color: var(--foreground-muted, #5c5c5a);
+      }
+      .initial-load-center {
+        position: relative;
+        display: grid;
+        justify-items: center;
+        gap: 28px;
+      }
+      .initial-load-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--initial-ink);
+        opacity: .88;
+      }
+      .initial-load-brand svg { display: block; width: 36px; height: 36px; }
+      .initial-load-brand span {
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: -.9px;
+      }
+      .initial-load-track {
+        width: 72px;
+        height: 2px;
+        overflow: hidden;
+        border-radius: 2px;
+        background: color-mix(in srgb, var(--initial-ink) 9%, transparent);
+      }
+      .initial-load-track span {
+        display: block;
+        width: 28px;
+        height: 100%;
+        border-radius: inherit;
+        background: var(--initial-ink);
+        animation: threeui-initial-drift 1.8s cubic-bezier(.45, 0, .25, 1) infinite;
+      }
+      @keyframes threeui-initial-drift {
+        0% { transform: translateX(-28px); opacity: 0; }
+        25%, 65% { opacity: .45; }
+        100% { transform: translateX(72px); opacity: 0; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .initial-load-track span { animation: none; transform: translateX(22px); opacity: .45; }
+      }
+      [data-threeui-loader] [role="status"] {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+      [data-threeui-loader] p { margin: 0; }
+      [data-threeui-recovery] {
+        position: absolute;
+        top: calc(100% + 28px);
+        left: 50%;
+        width: min(320px, calc(100vw - 48px));
+        transform: translateX(-50%);
+      }
+      [data-threeui-recovery] button,
+      [data-threeui-recovery] a {
+        display: inline-block;
+        margin: 12px 4px 0;
+        padding: 7px 11px;
+        border: 1px solid color-mix(in srgb, var(--initial-ink) 14%, transparent);
+        border-radius: 5px;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        text-decoration: none;
+        cursor: pointer;
+        transition: color .2s, border-color .2s;
+      }
+      [data-threeui-recovery] button:hover,
+      [data-threeui-recovery] a:hover {
+        color: var(--initial-ink);
+        border-color: color-mix(in srgb, var(--initial-ink) 30%, transparent);
+      }
+      [data-threeui-recovery] button:focus-visible,
+      [data-threeui-recovery] a:focus-visible {
+        outline: 2px solid var(--initial-ink);
+        outline-offset: 3px;
+      }
+    </style>
+    <script id="threeui-initial-load">
+      (() => {
+        const root = document.documentElement;
+        root.setAttribute("data-threeui-booting", "");
+        // React replaces the entire initial root, including this loader. If
+        // its bundle fails, offer recovery without automatically flashing text.
+        window.setTimeout(() => {
+          const recovery = document.querySelector("[data-threeui-recovery]");
+          if (!recovery) return;
+          const basicView = recovery.querySelector("button");
+          basicView.addEventListener("click", () => {
+            root.removeAttribute("data-threeui-booting");
+            document.querySelector("[data-threeui-static]")?.focus();
+          }, { once: true });
+          recovery.hidden = false;
+        }, 10000);
+      })();
+    </script>
+    <meta name="description" content="The requested ThreeUI page could not be found. Browse the complete component collection instead." />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ThreeUI" />
+    <meta property="og:title" content="Page Not Found | ThreeUI" />
+    <meta property="og:description" content="The requested ThreeUI page could not be found. Browse the complete component collection instead." />
+    <meta property="og:url" content="https://threeui.com/404.html" />
+    <meta property="og:image" content="https://threeui.com/social/threeui-living-world-prompts.jpg" />
+    <meta property="og:image:secure_url" content="https://threeui.com/social/threeui-living-world-prompts.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="ThreeUI — 3D Prompts for Opus 5.5 and Astra, with Claude and OpenAI logos. Open Source. 6.2k GitHub Stars. Chrome ThreeUI emblem in a moss-covered forest." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Page Not Found | ThreeUI" />
+    <meta name="twitter:description" content="The requested ThreeUI page could not be found. Browse the complete component collection instead." />
+    <meta name="twitter:image" content="https://threeui.com/social/threeui-living-world-prompts.jpg" />
+    <meta name="twitter:image:alt" content="ThreeUI — 3D Prompts for Opus 5.5 and Astra, with Claude and OpenAI logos. Open Source. 6.2k GitHub Stars. Chrome ThreeUI emblem in a moss-covered forest." />
+    <link rel="canonical" href="https://threeui.com/404.html" />
+    <link rel="icon" href="https://ublctyddhtbgaersvxxb.supabase.co/storage/v1/object/public/threeui-media/scene-images/45980dbc14edd15a36a847f0/threeui-mark.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Page Not Found | ThreeUI</title>
+    <script type="module" crossorigin src="/assets/index-Cf3aCPch.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CZ08EKrX.css">
+      <meta property="og:image:type" content="image/jpeg" />
+  </head>
+  <body>
+    <div id="root"><!-- threeui:static-content:start --><main class="doc" data-threeui-static tabindex="-1" style="height:100dvh;overflow:auto"><nav aria-label="ThreeUI"><a href="/browse">Browse components</a> · <a href="/pricing">Pricing</a> · <a href="/installation">Installation</a> · <a href="/mcp">MCP</a></nav><h1>Page Not Found</h1><p>The requested ThreeUI page could not be found. Browse the complete component collection instead.</p></main><div data-threeui-loader><div class="initial-load-center">
+      <div class="initial-load-brand" aria-hidden="true">
+        <svg viewBox="0 0 512 512" focusable="false">
+          <defs><mask id="threeui-initial-mark" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
+            <rect width="512" height="512" fill="#000"/>
+            <circle cx="256" cy="256" r="208" fill="#fff"/>
+            <g fill="none" stroke="#000" stroke-linecap="round" stroke-width="28">
+              <path d="M36 178C112 252 184 264 260 196C336 128 404 114 482 180"/>
+              <path d="M36 292C112 366 184 378 260 310C336 242 404 228 482 294"/>
+            </g>
+          </mask></defs>
+          <rect width="512" height="512" fill="currentColor" mask="url(#threeui-initial-mark)"/>
+        </svg><span>threeui</span>
+      </div>
+      <div class="initial-load-track" aria-hidden="true"><span></span></div>
+      <p role="status">Loading ThreeUI…</p>
+      <div data-threeui-recovery hidden><p>This is taking longer than usual.</p><a href="">Reload</a><button type="button">Browse basic site</button></div>
+    </div></div><!-- threeui:static-content:end --></div>
+  </body>
+</html>

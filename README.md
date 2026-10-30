@@ -1,67 +1,87 @@
-# Thaw — A Gentle Co-Pilot for Getting Unstuck
+# Thaw — An Adaptive Co-Pilot for Getting Unstuck
 
-**Thaw** is an AI-powered adaptive planner and executive-function co-pilot designed for university students experiencing task paralysis, overwhelm, or burnout.
+Thaw is an AI-powered adaptive planner and executive-function co-pilot for university students experiencing task paralysis, overwhelm, or burnout.
 
----
+It does not maximize productivity at any cost. It helps a person determine a realistic next action, initiate that action with minimal friction, adapt plans to current capacity, and choose rest when appropriate.
 
-## Problem Statement & Philosophy
+## Core principles
 
-Conventional productivity apps rely on rigid schedules, alarms, shaming overdue labels, and broken streaks. For neurodivergent students or anyone experiencing executive dysfunction, these features often worsen anxiety and paralysis. 
+1. **Progress adapts to the person** — plans flex around energy, deadlines, and capacity.
+2. **Reduce cognitive load** — one clear next action, not a wall of tasks.
+3. **The user stays in control** — every recommendation can be edited, regenerated, saved, or declined; rest is always an equal option.
 
-Thaw replaces pressure with:
-1. **Spoon Energy Check-in:** A 1–5 spoons scale that adjusts recommendations to daily capacity.
-2. **AI-Assisted Micro-Steps:** Turning daunting projects into 2-minute starting steps grounded in RAG cognitive strategies.
-3. **Guilt-Free Rest Mode:** First-class rest sanctuaries without punitive scoring or streak guilt.
-4. **Privacy-First Architecture:** Local-first storage with transparent data controls.
+## Technical differentiator
 
----
+An energy-aware, retrieval-grounded (RAG) task-sequencing engine that converts overwhelming academic work into realistic, context-sensitive micro-actions. Before generating steps, Thaw retrieves relevant non-clinical strategies (task initiation, decomposition, low-energy pacing, rest) and grounds the AI's suggestions in them.
 
-## Key Features
+## Tech stack
 
-- **Landing Page:** Immersive scenic storytelling introducing the problem and solution.
-- **Dashboard:** Centralized hub featuring the Spoon Energy Budget and current focus task.
-- **My Tasks:** Interactive task manager with deadlines, spoon requirements, and duration estimates.
-- **AI Task Sequencer:** RAG-powered engine providing compassionate acknowledgment and microscopic steps.
-- **Focus Timer:** 2-minute starter timer with calm body-double presence.
-- **Rest Mode:** Dedicated sanctuary with guided breathing pacer.
-- **Adaptive Weekly Planner:** Energy-aware weekly grid with one-click rebalancing.
-- **Activity History:** Neutral reflection log of completed work.
-- **Settings & Privacy Centre:** Full control over local storage and reduced-motion preferences.
+- Next.js 14 (App Router) + React 18 + TypeScript
+- Tailwind CSS, Framer Motion, Lucide icons
+- React Context + LocalStorage persistence
+- Cinematic 3D Bookshelf with physical book portal spreads
+- Liquid Glass floating navbar with dynamic active route indicator
+- Atmospheric Book-Opening Loading Intro sequence
+- Server-side `/api/sequence` route with RAG retrieval
+- Optional Anthropic / Gemini API keys (local deterministic fallback when none configured)
 
----
+## Routes
 
-## Technology Stack
+| Route | Purpose |
+|-------|---------|
+| `/` | Landing page |
+| `/dashboard` | Today's workspace — one recommended next action, energy check-in, upcoming work |
+| `/tasks` | Full task CRUD, subtasks, filter, sort, search |
+| `/sequencer` | AI task breakdown with editable results |
+| `/timer` | Focus timer with body-double presence |
+| `/rest` | Guilt-free rest sanctuary |
+| `/planner` | Energy-aware weekly planner with rebalance |
+| `/activity` | Neutral activity history |
+| `/insights` | Real metrics from stored data |
+| `/settings` | Privacy & preferences |
 
-- **Framework:** Next.js (App Router) + React + TypeScript
-- **Styling:** Tailwind CSS + Lucide Icons + Glassmorphism UI
-- **State Management:** React Context + LocalStorage persistence
-- **AI & RAG:** Server-side API route with RAG strategy retrieval and Anthropic/Gemini integration (with robust local fallback).
+## Getting started
 
----
+```bash
+npm install
+npm run dev
+# Open http://localhost:3000
+```
 
-## Getting Started
+## Environment variables
 
-1. **Install Dependencies:**
-   ```bash
-   npm install
-   ```
-
-2. **Run Development Server:**
-   ```bash
-   npm run dev
-   ```
-
-3. **Open in Browser:**
-   Navigate to `http://localhost:3000`.
-
----
-
-## Environment Variables (`.env.example`)
+See `.env.example`. AI provider keys are optional. Without them, Thaw uses a clearly identified local fallback.
 
 ```env
-# Optional: Anthropic Claude API Key for Live AI Task Sequencing
+# Optional — only needed for live AI task sequencing
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
-
-# Optional: Google Gemini API Key
 GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+## Data & privacy
+
+- Tasks, energy levels, and activity history are stored in browser `localStorage` only.
+- Nothing is synchronized across devices.
+- Task text is sent to an AI provider only when you use the sequencer (and only if a key is configured).
+- You can export or delete all local data in Settings.
+- Thaw does not track browsing, capture keystrokes, or infer diagnoses.
+
+## Documentation
+
+- `docs/ARCHITECTURE.md` — system design and data flow
+- `docs/AI_RAG_DESIGN.md` — AI provider, retrieval, and transparency design
+- `docs/DEMO_SCRIPT.md` — 3-minute panel demo script
+- `docs/IMPLEMENTATION_STATUS.md` — implemented vs planned features
+
+## Limitations
+
+- Persistence is `localStorage`-scoped to one browser profile; no multi-user backend.
+- RAG retrieval is keyword + metadata based (not vector search) unless a vector DB is configured.
+- No clinical validation or therapeutic claims are made.
+
+## Build & verification
+
+```bash
+npm run build    # production build + typecheck + lint
+npm run dev      # dev server
 ```

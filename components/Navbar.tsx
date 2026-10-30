@@ -13,7 +13,8 @@ import {
   Calendar, 
   Activity as ActivityIcon, 
   Settings,
-  Shield
+  Shield,
+  BarChart3
 } from 'lucide-react';
 import { useThaw } from '@/lib/store';
 
@@ -29,6 +30,7 @@ export function Navbar() {
     { href: '/rest', label: 'Rest Mode', icon: Coffee },
     { href: '/planner', label: 'Planner', icon: Calendar },
     { href: '/activity', label: 'Activity', icon: ActivityIcon },
+    { href: '/insights', label: 'Insights', icon: BarChart3 },
     { href: '/settings', label: 'Settings', icon: Settings },
   ];
 

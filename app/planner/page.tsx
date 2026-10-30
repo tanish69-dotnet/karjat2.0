@@ -1,83 +1,191 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useThaw } from '@/lib/store';
-import { Calendar, RefreshCw, Sparkles, CheckSquare } from 'lucide-react';
+import { Calendar, RefreshCw, Sparkles, CheckCircle2, ArrowRight, BookOpen } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { rebalanceWeek, DAYS } from '@/lib/scheduler';
+import { useToast } from '@/components/ui/toast';
+import { OpenBookSpreadView } from '@/components/OpenBookSpreadView';
+import { findBookByRoute } from '@/lib/books';
 
 export default function PlannerPage() {
-  const { tasks, energyLevel } = useThaw();
-  const [rebalanced, setRebalanced] = useState(false);
+  const { tasks, updateTask, energyLevel, logActivity } = useThaw();
+  const { addToast } = useToast();
 
-  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  const pendingTasks = tasks.filter((t) => !t.completed);
+  const [proposal, setProposal] = useState<ReturnType<typeof rebalanceWeek> | null>(null);
+  const [reviewing, setReviewing] = useState(false);
+  const [applied, setApplied] = useState(false);
+  const [viewMode, setViewMode] = useState<'book' | 'workstation'>('book');
+  const bookConfig = findBookByRoute('/planner');
+
+  useEffect(() => {
+    setProposal(rebalanceWeek(pendingTasks, energyLevel));
+  }, [pendingTasks, energyLevel]);
 
   const handleRebalance = () => {
-    setRebalanced(true);
-    setTimeout(() => setRebalanced(false), 4000);
+    setReviewing(true);
+    setApplied(false);
+    setProposal(rebalanceWeek(pendingTasks, energyLevel));
+  };
+
+  const handleApply = () => {
+    if (!proposal) return;
+    proposal.scheduled.forEach((item) => {
+      updateTask(item.task.id, {
+        deadline: item.dayLabel,
+        estimatedMinutes: item.task.estimatedMinutes,
+        energyRequired: item.task.energyRequired,
+        isFlexible: true,
+      });
+    });
+    setApplied(true);
+    setReviewing(false);
+    logActivity('task_completed', 'Balanced workload across upcoming days');
+    addToast({ title: 'Schedule synchronized to current capacity', type: 'success' });
   };
 
   return (
-    <div className="flex-1 px-6 md:px-12 py-8 max-w-6xl mx-auto w-full">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div className="space-y-10 animate-fade-in">
+      {/* Header */}
+      <section className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[rgba(244,238,230,0.12)]">
         <div>
-          <h1 className="text-3xl font-serif text-white">Adaptive Weekly Planner</h1>
-          <p className="text-sm text-thaw-300 mt-1">A flexible weekly view designed around your energy and deadlines.</p>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#171a24] border border-[rgba(244,238,230,0.14)] text-[#c87046] text-xs font-mono uppercase tracking-widest mb-3">
+            <Calendar className="w-3.5 h-3.5" />
+            <span>Volume VI · Weekly Atlas</span>
+          </div>
+          <h1 className="text-3xl md:text-5xl font-editorial text-[#f4eee6] tracking-tight">
+            Capacity-Aware Planning
+          </h1>
+          <p className="text-[#b9b4ae] mt-2 text-sm md:text-base max-w-xl">
+            Distribute commitments without over-borrowing from future spoons. Workload dynamically flexes around energy reality.
+          </p>
         </div>
-        <button
-          onClick={handleRebalance}
-          className="px-5 py-2.5 rounded-xl bg-sage-500 text-thaw-950 font-medium hover:bg-sage-400 transition flex items-center gap-2 text-sm shadow-lg"
-        >
-          <RefreshCw className={`w-4 h-4 ${rebalanced ? 'animate-spin' : ''}`} />
-          {rebalanced ? 'Rebalancing...' : 'Rebalance My Week'}
-        </button>
-      </div>
 
-      {rebalanced && (
-        <div className="mb-6 p-4 rounded-2xl bg-sage-500/20 border border-sage-500 text-sage-200 text-sm flex items-center gap-2 animate-fadeIn">
-          <Sparkles className="w-4 h-4 text-amber-300" />
-          <span>Weekly schedule successfully rebalanced! Flexible tasks were redistributed to protect your low-energy days.</span>
+        <div className="flex items-center gap-3">
+          {/* Dual Experience Switcher */}
+          <div className="flex items-center gap-1 p-1 rounded-full bg-[#10131b] border border-[rgba(244,238,230,0.14)] shadow-md">
+            <button
+              type="button"
+              onClick={() => setViewMode('book')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono transition ${
+                viewMode === 'book'
+                  ? 'bg-[#c87046] text-white font-semibold shadow-md shadow-[#c87046]/40'
+                  : 'text-[#b9b4ae] hover:text-[#f4eee6]'
+              }`}
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Physical Book</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('workstation')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono transition ${
+                viewMode === 'workstation'
+                  ? 'bg-[#c87046] text-white font-semibold shadow-md shadow-[#c87046]/40'
+                  : 'text-[#b9b4ae] hover:text-[#f4eee6]'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Weekly Grid</span>
+            </button>
+          </div>
+
+          <Button
+            variant="primary"
+            size="md"
+            onClick={() => {
+              setViewMode('workstation');
+              handleRebalance();
+            }}
+            disabled={reviewing}
+          >
+            <RefreshCw className={`w-4 h-4 ${reviewing ? 'animate-spin' : ''}`} />
+            <span>Rebalance My Week</span>
+          </Button>
+        </div>
+      </section>
+
+      {/* Book Spread View (Default Physical-Looking Pages) */}
+      {viewMode === 'book' && bookConfig && (
+        <section className="py-2">
+          <OpenBookSpreadView
+            book={bookConfig}
+            onClose={() => setViewMode('workstation')}
+          />
+        </section>
+      )}
+
+      {/* Workstation Weekly Atlas View */}
+      {viewMode === 'workstation' && (
+      <>
+
+      {/* Review Box if proposal active */}
+      {reviewing && proposal && (
+        <div className="p-6 rounded-2xl bg-[#141822] border border-[#c87046]/40 shadow-library space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-[rgba(244,238,230,0.1)]">
+            <span className="label-micro text-[#c87046]">Rebalance Proposal Ready</span>
+            <span className="text-xs font-mono text-[#b9b4ae]">{proposal.scheduled.length} tasks paced</span>
+          </div>
+          <p className="text-xs text-[#b9b4ae] leading-relaxed">
+            Tasks have been redistributed according to your current energy level ({energyLevel} spoons). Review and confirm to update your ledger.
+          </p>
+          <div className="flex gap-3 pt-2">
+            <Button variant="primary" size="sm" onClick={handleApply}>
+              Confirm & Apply Schedule
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => setReviewing(false)}>
+              Discard
+            </Button>
+          </div>
         </div>
       )}
 
-      {/* Days Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
-        {days.map((day, index) => {
-          const isToday = index === 0; // Monday as today for demo
-          const dayTasks = tasks.slice(index % 2, (index % 2) + 2);
-
+      {/* Weekly Grid Days */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {DAYS.slice(0, 7).map((day, idx) => {
+          const dayItems = (proposal?.scheduled || []).filter((s) => s.dayLabel === day || (idx === 0 && s.dayLabel === 'Today'));
           return (
             <div
               key={day}
-              className={`glass-panel p-4 rounded-2xl flex flex-col justify-between min-h-[300px] border ${
-                isToday ? 'border-sage-500 bg-sage-500/10' : 'border-thaw-700/50'
-              }`}
+              className="p-5 rounded-2xl bg-[#171a24] border border-[rgba(244,238,230,0.12)] hover:border-[rgba(244,238,230,0.22)] shadow-library flex flex-col justify-between min-h-[220px]"
             >
               <div>
-                <div className="flex items-center justify-between mb-3 pb-2 border-b border-thaw-800">
-                  <h3 className="font-serif text-white text-sm">{day}</h3>
-                  {isToday && <span className="text-[10px] px-2 py-0.5 rounded-full bg-sage-500 text-thaw-950 font-bold">Today</span>}
+                <div className="flex items-center justify-between pb-3 border-b border-[rgba(244,238,230,0.08)] mb-3">
+                  <span className="text-xs font-mono uppercase tracking-wider text-[#c87046] font-semibold">{day}</span>
+                  <span className="text-[10px] font-mono text-[#b9b4ae]">{dayItems.length} items</span>
                 </div>
 
                 <div className="space-y-2">
-                  {dayTasks.map(t => (
-                    <div key={t.id} className="glass-card p-3 rounded-xl">
-                      <h4 className="text-xs font-medium text-white mb-1">{t.title}</h4>
-                      <p className="text-[10px] text-sage-300">🥄 {t.energyRequired} spoons • {t.estimatedMinutes || 15}m</p>
-                    </div>
-                  ))}
-                  {dayTasks.length === 0 && (
-                    <p className="text-[11px] text-thaw-400 italic text-center py-6">Light schedule (Rest prioritized)</p>
+                  {dayItems.length > 0 ? (
+                    dayItems.map((item) => (
+                      <div
+                        key={item.task.id}
+                        className="p-2.5 rounded-xl bg-[#10131b] border border-[rgba(244,238,230,0.08)] text-xs"
+                      >
+                        <p className="font-medium text-[#f4eee6] truncate">{item.task.title}</p>
+                        <span className="text-[10px] font-mono text-[#c87046]">
+                          {item.task.estimatedMinutes ? `${item.task.estimatedMinutes}m` : 'Flexible'} · Level {item.task.energyRequired ?? 3}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-[11px] font-mono text-[#78736d] py-6 text-center">Unallocated space</p>
                   )}
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-thaw-800/50 text-[11px] text-sage-300 flex items-center justify-between">
-                <span>Capacity</span>
-                <span className="text-amber-300">🥄 {Math.max(2, energyLevel)}/5</span>
+              <div className="pt-3 border-t border-[rgba(244,238,230,0.06)] text-[10px] font-mono text-[#78736d] text-center">
+                Protected buffer
               </div>
             </div>
           );
         })}
       </div>
+      </>
+      )}
     </div>
   );
 }
