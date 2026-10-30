@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pegasus Focus Companion</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="pegasus-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="header-emblem">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8L12 2Z"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="app-title">Pegasus</h1>
+          <p class="app-subtitle">AI Focus & Study Companion</p>
+        </div>
+      </div>
+      <div class="header-status">
+        <span class="status-indicator-dot" id="liveDot"></span>
+        <span class="status-badge" id="stateBadge">On Track</span>
+      </div>
+    </header>
+
+    <!-- Companion Interactive Circle Section -->
+    <section class="companion-hero">
+      <div class="circle-wrapper" id="pegasusCircleBtn" role="button" tabindex="0" title="Click to view companion check-in">
+        <div class="circle-outer-ring" id="circleRing"></div>
+        <div class="circle-inner-core">
+          <svg class="pegasus-icon" viewBox="0 0 24 24">
+            <path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8L12 2Z"></path>
+          </svg>
+        </div>
+      </div>
+      <p class="circle-caption" id="circleCaption">Click for Smart Check-In</p>
+
+      <!-- Expandable Smart Check-In Card -->
+      <div class="checkin-card" id="checkinCard">
+        <div class="checkin-header">
+          <span class="checkin-label" id="checkinLabel">Observation</span>
+          <span class="checkin-time" id="checkinTime">Just now</span>
+        </div>
+        <p class="checkin-msg" id="checkinMsg">You're doing fine. Keep going!</p>
+        <p class="checkin-sub" id="checkinSub">Pegasus is observing quietly in the background.</p>
+        <div class="checkin-actions" id="checkinActions">
+          <button class="btn btn-primary" id="btnCheckinPrimary">Open Focus Chamber</button>
+          <button class="btn btn-secondary" id="btnCheckinSecondary">Dismiss</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Real-Time Metrics Grid -->
+    <section class="metrics-grid">
+      <div class="metric-card">
+        <span class="metric-label">Efficiency</span>
+        <div class="metric-val-row">
+          <span class="metric-val" id="metricEfficiency">100%</span>
+        </div>
+        <div class="efficiency-bar-bg">
+          <div class="efficiency-bar-fill" id="efficiencyBar" style="width: 100%;"></div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <span class="metric-label">Study Time</span>
+        <div class="metric-val-row">
+          <span class="metric-val text-study" id="metricStudy">0m 00s</span>
+        </div>
+        <span class="metric-sub" id="metricDistraction">0m distraction</span>
+      </div>
+
+      <div class="metric-card">
+        <span class="metric-label">Tab Switches</span>
+        <div class="metric-val-row">
+          <span class="metric-val" id="metricSwitches">0</span>
+        </div>
+        <span class="metric-sub" id="metricVelocity">0 / min velocity</span>
+      </div>
+    </section>
+
+    <!-- Active Tab & Study Anchor -->
+    <section class="activity-section">
+      <div class="section-row">
+        <span class="section-title">Current Tab</span>
+        <span class="category-pill pill-neutral" id="currentCategoryPill">Neutral</span>
+      </div>
+      <div class="tab-info-card">
+        <p class="tab-title-text" id="currentTabTitle">Detecting active page...</p>
+        <p class="tab-domain-text" id="currentTabDomain">localhost:3000</p>
+      </div>
+
+      <!-- Anchor Study Tab Notice (if switched away) -->
+      <div class="anchor-study-card" id="anchorStudyCard" style="display: none;">
+        <div class="anchor-study-info">
+          <span class="anchor-tag">Anchor Study Tab</span>
+          <p class="anchor-title" id="anchorTitle">Reading Material</p>
+        </div>
+        <button class="btn btn-sm btn-copper" id="btnReturnStudy">Return</button>
+      </div>
+    </section>
+
+    <!-- AI Assistance & Quick Actions -->
+    <section class="ai-assistant-section">
+      <div class="section-row">
+        <span class="section-title">Context-Aware AI</span>
+        <button class="btn-text-link" id="btnAssistSummary">Summarize Study Material</button>
+      </div>
+      <div class="ai-response-box" id="aiResponseBox" style="display: none;">
+        <p class="ai-response-text" id="aiResponseText">Loading AI guidance...</p>
+      </div>
+      <div class="quick-action-row">
+        <button class="btn btn-action" id="btnOpenTimer">
+          <svg viewBox="0 0 24 24" class="icon-inline"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          Focus Timer
+        </button>
+        <button class="btn btn-action" id="btnOpenSequencer">
+          <svg viewBox="0 0 24 24" class="icon-inline"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          AI Sequencer
+        </button>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-left">
+        <span class="backend-status-pill" id="backendPill">AI RAG: Ready</span>
+      </div>
+      <div class="footer-right">
+        <button class="btn-link" id="btnResetSession">Reset Stats</button>
+      </div>
+    </footer>
+  </div>
+
+  <script src="utils.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
