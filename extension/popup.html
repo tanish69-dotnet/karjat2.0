@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Thaw Guardian</title>
+  <style>
+    body {
+      width: 320px;
+      margin: 0;
+      padding: 16px;
+      background: #080808;
+      color: #f4eee6;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(244, 238, 230, 0.12);
+      margin-bottom: 14px;
+    }
+    .emblem {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(200, 112, 70, 0.2);
+      color: #c87046;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .title {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .status-card {
+      background: #141822;
+      border: 1px solid rgba(244, 238, 230, 0.14);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .status-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #c87046;
+      margin-bottom: 4px;
+    }
+    .status-desc {
+      font-size: 12px;
+      color: #b9b4ae;
+      line-height: 1.4;
+    }
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 10px;
+      border-radius: 999px;
+      border: none;
+      background: #c87046;
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(200, 112, 70, 0.3);
+      transition: background 0.2s;
+    }
+    .btn:hover {
+      background: #b56138;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-size: 11px;
+    }
+    .footer-links a {
+      color: #b9b4ae;
+      text-decoration: none;
+    }
+    .footer-links a:hover {
+      color: #c87046;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="emblem">❄</div>
+    <div class="title">Thaw Focus Guardian</div>
+  </div>
+
+  <div class="status-card">
+    <div class="status-label">Active Monitoring</div>
+    <div class="status-desc">
+      Observing tab switching signals & high-stimulation sites. Nudges are compassionate and zero-shame.
+    </div>
+  </div>
+
+  <a href="http://localhost:3000/dashboard" target="_blank" class="btn">
+    Open Reading Desk
+  </a>
+
+  <div class="footer-links">
+    <a href="http://localhost:3000/timer" target="_blank">Focus Chamber</a>
+    <a href="http://localhost:3000/sequencer" target="_blank">AI Sequencer</a>
+    <a href="http://localhost:3000/rest" target="_blank">Rest Sanctuary</a>
+  </div>
+</body>
+</html>

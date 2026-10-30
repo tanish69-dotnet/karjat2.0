@@ -184,7 +184,7 @@ export function PaperSequencerFeature() {
           <div className="flex items-center justify-between pt-1 text-[10px] font-mono text-[#7a6555]">
             <span>Strategy: {result.strategyUsed}</span>
             <Link
-              href="/timer"
+              href={`/timer?task=${encodeURIComponent(result.firstStep || taskInput)}&duration=${encodeURIComponent(result.steps[0]?.duration || '2 mins')}`}
               className="text-[#8b4513] font-bold underline flex items-center gap-1"
             >
               Start Focus Chamber <ArrowRight className="w-3 h-3" />

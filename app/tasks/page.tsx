@@ -355,7 +355,7 @@ export default function TasksPage() {
                 </Link>
 
                 <Link
-                  href={`/timer?task=${encodeURIComponent(task.title)}`}
+                  href={`/timer?task=${encodeURIComponent(task.title)}&duration=${encodeURIComponent(task.estimatedMinutes ? `${task.estimatedMinutes}m` : '15m')}`}
                   className="p-2 rounded-lg bg-[#10131b] border border-[rgba(244,238,230,0.12)] text-[#b9b4ae] hover:text-[#f4eee6] transition"
                   title="Focus on this task"
                 >

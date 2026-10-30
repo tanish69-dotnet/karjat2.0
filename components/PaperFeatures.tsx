@@ -11,7 +11,9 @@ import {
   Trash2,
   Sliders,
   Check,
+  Clock,
 } from "lucide-react";
+import Link from "next/link";
 
 // ─── 1. ENERGY CHECK-IN ───────────────────────────────────────────────────────
 export function PaperEnergyFeature() {
@@ -455,6 +457,13 @@ export function PaperTasksFeature() {
                 <span className="text-[10px] font-mono text-[#8b4513] bg-[#8b4513]/10 px-1 rounded">
                   {task.energyRequired} sp
                 </span>
+                <Link
+                  href={`/timer?task=${encodeURIComponent(task.title)}&duration=${encodeURIComponent(task.estimatedMinutes ? `${task.estimatedMinutes}m` : '15m')}`}
+                  className="text-[#8b4513] hover:text-[#72360e]"
+                  title="Launch into Focus Chamber"
+                >
+                  <Clock className="w-3.5 h-3.5" />
+                </Link>
                 <button
                   type="button"
                   onClick={() => deleteTask(task.id)}

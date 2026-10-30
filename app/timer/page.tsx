@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useThaw } from '@/lib/store';
 import { Timer, Play, Pause, RotateCcw, Coffee, CheckCircle, ArrowRight, Sparkles, BookOpen, Sliders, Check } from 'lucide-react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
 import { OpenBookSpreadView } from '@/components/OpenBookSpreadView';
@@ -20,15 +21,47 @@ const PRESETS = [
 export default function TimerPage() {
   const { logActivity } = useThaw();
   const { addToast } = useToast();
+  const searchParams = useSearchParams();
+  const taskQuery = searchParams.get('task');
+  const durationQuery = searchParams.get('duration');
 
-  const [duration, setDuration] = useState<number>(120);
-  const [timeLeft, setTimeLeft] = useState<number>(120);
+  const [activeTask, setActiveTask] = useState<string | null>(taskQuery);
+  const [duration, setDuration] = useState<number>(() => {
+    if (durationQuery) {
+      const match = durationQuery.match(/(\d+)/);
+      if (match) return Math.max(60, parseInt(match[1], 10) * 60);
+    }
+    return 120;
+  });
+  const [timeLeft, setTimeLeft] = useState<number>(() => {
+    if (durationQuery) {
+      const match = durationQuery.match(/(\d+)/);
+      if (match) return Math.max(60, parseInt(match[1], 10) * 60);
+    }
+    return 120;
+  });
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
   const [isCustomizing, setIsCustomizing] = useState<boolean>(false);
   const [customInput, setCustomInput] = useState<string>('25');
-  const [viewMode, setViewMode] = useState<'book' | 'workstation'>('book');
+  const [viewMode, setViewMode] = useState<'book' | 'workstation'>('workstation');
   const bookConfig = findBookByRoute('/timer');
+
+  // React to query parameter updates
+  useEffect(() => {
+    if (taskQuery) {
+      setActiveTask(taskQuery);
+    }
+    if (durationQuery) {
+      const match = durationQuery.match(/(\d+)/);
+      if (match) {
+        const secs = Math.max(60, parseInt(match[1], 10) * 60);
+        setDuration(secs);
+        setTimeLeft(secs);
+        setViewMode('workstation');
+      }
+    }
+  }, [taskQuery, durationQuery]);
 
   const startTimeRef = useRef<number | null>(null);
   const pausedAtRef = useRef<number | null>(null);
@@ -178,6 +211,24 @@ export default function TimerPage() {
       {/* Main Dial Chamber View */}
       {viewMode === 'workstation' && (
       <>
+      {activeTask && (
+        <div className="p-4 rounded-2xl bg-[#171a24] border border-[#c87046]/40 shadow-library flex items-center justify-between gap-4 text-left animate-fade-in max-w-xl mx-auto">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#c87046] animate-pulse shrink-0" />
+            <div className="min-w-0">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[#c87046] font-semibold block">Connected Task</span>
+              <p className="text-sm font-editorial text-[#f4eee6] truncate">{activeTask}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setActiveTask(null)}
+            className="text-[10px] font-mono uppercase tracking-wider text-[#b9b4ae] hover:text-[#f4eee6] shrink-0"
+          >
+            Clear
+          </button>
+        </div>
+      )}
+
       <div className="p-8 md:p-12 rounded-3xl bg-[#141822] border border-[rgba(244,238,230,0.14)] shadow-library flex flex-col items-center relative overflow-hidden">
         {/* Ambient Ring Glow */}
         <div className="absolute inset-0 bg-radial-gradient pointer-events-none opacity-20" />

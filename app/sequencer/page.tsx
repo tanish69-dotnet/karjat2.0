@@ -365,7 +365,7 @@ export default function SequencerPage() {
               </Button>
 
               <Link
-                href={`/timer?task=${encodeURIComponent(result.firstStep || taskInput)}`}
+                href={`/timer?task=${encodeURIComponent(result.firstStep || taskInput)}&duration=${encodeURIComponent(result.steps?.[0]?.duration || '2 mins')}`}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#c87046] hover:bg-[#b56138] text-white text-xs font-mono uppercase tracking-wider font-semibold transition shadow-md shadow-[#c87046]/20"
               >
                 <Play className="w-3.5 h-3.5 fill-current" />
