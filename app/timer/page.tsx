@@ -18,7 +18,7 @@ const PRESETS = [
   { label: '25 min Deep', secs: 1500 },
 ];
 
-export default function TimerPage() {
+function TimerContent() {
   const { logActivity } = useThaw();
   const { addToast } = useToast();
   const searchParams = useSearchParams();
@@ -389,5 +389,19 @@ export default function TimerPage() {
       </>
       )}
     </div>
+  );
+}
+
+export default function TimerPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-[60vh] text-[#b9b4ae] font-mono text-xs uppercase tracking-widest">
+          Calibrating Focus Chamber...
+        </div>
+      }
+    >
+      <TimerContent />
+    </React.Suspense>
   );
 }
