@@ -9,6 +9,8 @@ import {
   RotateCcw,
   Plus,
   Trash2,
+  Sliders,
+  Check,
 } from "lucide-react";
 
 // ─── 1. ENERGY CHECK-IN ───────────────────────────────────────────────────────
@@ -112,6 +114,8 @@ export function PaperTimerFeature() {
   const [minutes, setMinutes] = useState(25);
   const [secondsLeft, setSecondsLeft] = useState(25 * 60);
   const [isRunning, setIsRunning] = useState(false);
+  const [isCustomizing, setIsCustomizing] = useState(false);
+  const [customInput, setCustomInput] = useState("25");
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -130,8 +134,19 @@ export function PaperTimerFeature() {
 
   function setPreset(m: number) {
     setIsRunning(false);
-    setMinutes(m);
-    setSecondsLeft(m * 60);
+    setIsCustomizing(false);
+    const valid = Math.max(1, Math.min(180, m));
+    setMinutes(valid);
+    setSecondsLeft(valid * 60);
+  }
+
+  function handleCustomSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const val = parseInt(customInput, 10);
+    if (!isNaN(val) && val > 0 && val <= 180) {
+      setPreset(val);
+      setIsCustomizing(false);
+    }
   }
 
   const mins = Math.floor(secondsLeft / 60);
@@ -139,27 +154,70 @@ export function PaperTimerFeature() {
   const progress = 1 - secondsLeft / (minutes * 60);
 
   return (
-    <div className="space-y-4 text-[#2a221b] text-center">
-      {/* Interval Selector */}
-      <div className="flex items-center justify-center gap-2">
-        {[10, 25, 50].map((m) => (
+    <div className="space-y-3 text-[#2a221b] text-center">
+      {/* Interval Selector & Customizer */}
+      <div className="flex flex-wrap items-center justify-center gap-1.5">
+        {[5, 10, 25, 50].map((m) => (
           <button
             key={m}
             type="button"
             onClick={() => setPreset(m)}
-            className={`px-3 py-1 rounded text-xs font-mono transition ${
-              minutes === m && !isRunning
+            className={`px-2.5 py-1 rounded text-xs font-mono transition ${
+              minutes === m && !isCustomizing && !isRunning
                 ? "bg-[#8b4513] text-[#f7f2ea] shadow-sm font-bold"
                 : "bg-[#eee5d8] text-[#5c4a3d] hover:bg-[#8b4513]/15"
             }`}
           >
-            {m} min
+            {m}m
           </button>
         ))}
+
+        <button
+          type="button"
+          onClick={() => {
+            setIsCustomizing(!isCustomizing);
+            setCustomInput(String(minutes));
+          }}
+          className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono transition ${
+            isCustomizing
+              ? "bg-[#8b4513] text-[#f7f2ea] font-bold shadow-sm"
+              : "bg-[#eee5d8] text-[#5c4a3d] hover:bg-[#8b4513]/15"
+          }`}
+          title="Set custom duration"
+        >
+          <Sliders className="w-3 h-3" />
+          <span>{isCustomizing ? "Close" : "Custom"}</span>
+        </button>
       </div>
 
+      {/* Custom Duration Input Form */}
+      {isCustomizing && (
+        <form
+          onSubmit={handleCustomSubmit}
+          className="flex items-center justify-center gap-2 p-2 rounded-lg bg-[#eee5d8]/80 border border-[#8b4513]/25 max-w-xs mx-auto animate-fade-in"
+        >
+          <span className="text-[11px] font-mono text-[#5c4a3d] uppercase">Minutes:</span>
+          <input
+            type="number"
+            min={1}
+            max={180}
+            value={customInput}
+            onChange={(e) => setCustomInput(e.target.value)}
+            className="w-16 px-2 py-1 text-xs font-mono font-bold text-center rounded border border-[#8b4513]/40 bg-[#f7f2ea] text-[#1e1713] focus:outline-none focus:ring-1 focus:ring-[#8b4513]"
+            autoFocus
+          />
+          <button
+            type="submit"
+            className="px-2.5 py-1 rounded bg-[#8b4513] hover:bg-[#72360e] text-[#f7f2ea] text-xs font-mono font-medium flex items-center gap-1 shadow-sm"
+          >
+            <Check className="w-3 h-3" />
+            <span>Set</span>
+          </button>
+        </form>
+      )}
+
       {/* SVG Circular Dial */}
-      <div className="relative w-40 h-40 mx-auto flex items-center justify-center">
+      <div className="relative w-36 h-36 mx-auto flex items-center justify-center">
         <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
           <circle
             cx="50"
@@ -182,7 +240,7 @@ export function PaperTimerFeature() {
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <div className="text-3xl font-mono font-bold text-[#1e1713] tracking-tighter">
+          <div className="text-2xl font-mono font-bold text-[#1e1713] tracking-tighter">
             {String(mins).padStart(2, "0")}:{String(secs).padStart(2, "0")}
           </div>
           <div className="text-[9px] font-mono uppercase tracking-widest text-[#7a6555]">
@@ -192,7 +250,7 @@ export function PaperTimerFeature() {
       </div>
 
       {/* Controls */}
-      <div className="flex items-center justify-center gap-3 pt-2">
+      <div className="flex items-center justify-center gap-3 pt-1">
         <button
           type="button"
           onClick={() => setIsRunning(!isRunning)}

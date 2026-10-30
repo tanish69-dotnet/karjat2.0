@@ -73,14 +73,15 @@ export function LibraryHeader() {
 
         {/* Center: Premium Floating Liquid Glass Navbar */}
         <nav className="hidden lg:flex items-center justify-center min-w-0">
-          <LiquidGlassNavbar items={LIBRARY_VOLUMES.slice(0, 7)} />
+          <LiquidGlassNavbar items={LIBRARY_VOLUMES} />
         </nav>
 
         {/* Right: 3D Shelf Action & Live Spoon Indicator */}
         <div className="flex items-center gap-2 shrink-0">
           <Link
-            href="/"
+            href="/shelf"
             className="hidden xl:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#c87046]/35 text-[#c87046] text-xs font-mono uppercase tracking-wider backdrop-blur-md bg-[#171a24]/60 hover:bg-[#c87046]/15 hover:border-[#c87046] transition shadow-md whitespace-nowrap"
+            title="Open Interactive 3D Shelf"
           >
             <BookOpen className="w-3.5 h-3.5" />
             <span>3D Shelf</span>

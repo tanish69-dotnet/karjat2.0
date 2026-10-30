@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useThaw } from '@/lib/store';
-import { Timer, Play, Pause, RotateCcw, Coffee, CheckCircle, ArrowRight, Sparkles, BookOpen } from 'lucide-react';
+import { Timer, Play, Pause, RotateCcw, Coffee, CheckCircle, ArrowRight, Sparkles, BookOpen, Sliders, Check } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
@@ -25,6 +25,8 @@ export default function TimerPage() {
   const [timeLeft, setTimeLeft] = useState<number>(120);
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
+  const [isCustomizing, setIsCustomizing] = useState<boolean>(false);
+  const [customInput, setCustomInput] = useState<string>('25');
   const [viewMode, setViewMode] = useState<'book' | 'workstation'>('book');
   const bookConfig = findBookByRoute('/timer');
 
@@ -218,15 +220,18 @@ export default function TimerPage() {
           </div>
         </div>
 
-        {/* Preset Selector */}
+        {/* Preset Selector & Custom Input */}
         <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
           {PRESETS.map((p) => (
             <button
               key={p.secs}
-              onClick={() => selectDuration(p.secs)}
+              onClick={() => {
+                setIsCustomizing(false);
+                selectDuration(p.secs);
+              }}
               disabled={isRunning}
               className={`px-3.5 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider transition ${
-                duration === p.secs
+                duration === p.secs && !isCustomizing
                   ? 'bg-[#c87046] text-white font-semibold shadow-md shadow-[#c87046]/30'
                   : 'bg-[#10131b] border border-[rgba(244,238,230,0.12)] text-[#b9b4ae] hover:text-[#f4eee6]'
               }`}
@@ -234,7 +239,57 @@ export default function TimerPage() {
               {p.label}
             </button>
           ))}
+
+          <button
+            onClick={() => {
+              setIsCustomizing(!isCustomizing);
+              setCustomInput(String(Math.round(duration / 60)));
+            }}
+            disabled={isRunning}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider transition ${
+              isCustomizing
+                ? 'bg-[#c87046] text-white font-semibold shadow-md shadow-[#c87046]/30'
+                : 'bg-[#10131b] border border-[rgba(244,238,230,0.12)] text-[#b9b4ae] hover:text-[#f4eee6]'
+            }`}
+          >
+            <Sliders className="w-3.5 h-3.5" />
+            <span>{isCustomizing ? 'Close' : 'Custom'}</span>
+          </button>
         </div>
+
+        {/* Custom Duration Input Form */}
+        {isCustomizing && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const minsVal = parseInt(customInput, 10);
+              if (!isNaN(minsVal) && minsVal > 0 && minsVal <= 180) {
+                selectDuration(minsVal * 60);
+                setIsCustomizing(false);
+              }
+            }}
+            className="flex items-center justify-center gap-2 mb-8 p-3 rounded-2xl bg-[#10131b] border border-[rgba(244,238,230,0.14)]"
+          >
+            <span className="text-xs font-mono text-[#b9b4ae] uppercase">Custom Duration:</span>
+            <input
+              type="number"
+              min={1}
+              max={180}
+              value={customInput}
+              onChange={(e) => setCustomInput(e.target.value)}
+              className="w-20 px-3 py-1.5 text-sm font-mono font-bold text-center rounded-xl bg-[#171a24] border border-[#c87046]/40 text-[#f4eee6] focus:outline-none focus:border-[#c87046]"
+              autoFocus
+            />
+            <span className="text-xs font-mono text-[#b9b4ae]">mins</span>
+            <button
+              type="submit"
+              className="px-4 py-1.5 rounded-xl bg-[#c87046] hover:bg-[#b56138] text-white text-xs font-mono uppercase tracking-wider font-semibold transition flex items-center gap-1 shadow-md shadow-[#c87046]/20"
+            >
+              <Check className="w-3.5 h-3.5" />
+              <span>Apply</span>
+            </button>
+          </form>
+        )}
 
         {/* Controls */}
         <div className="flex items-center gap-4">
